@@ -8,7 +8,8 @@
 
 #import "WXMCountDownButton.h"
 @interface WXMCountDownButton ()
-@property (nonatomic, assign) NSInteger currentTime; /** 当前数字 */
+/** 当前数字 */
+@property (nonatomic, assign) NSInteger currentTime;
 @property (nonatomic, strong) dispatch_source_t countDownTimer;
 @property (nonatomic, strong) UIColor *oldColor;
 @property (nonatomic, copy) NSString *oldTitle;
@@ -29,7 +30,7 @@
     }
     return self;
 }
-/**  */
+
 - (void)buttonClick {
     if (self.delegate && [self.delegate respondsToSelector:@selector(startCountDown)]) {
         [self.delegate startCountDown]; return;
@@ -50,6 +51,7 @@
     dispatch_resume(self.countDownTimer);
     NSLog(@"开始倒计时");
 }
+
 /* 结束 */
 - (void)endCountDown {
     _isCountDown = NO;
@@ -61,11 +63,12 @@
     [self setTitle:_oldTitle forState:UIControlStateNormal];
     [self setTitleColor:_oldColor forState:UIControlStateNormal];
 }
+
 /* 倒计时 */
 - (void)countDown {
 
-    _currentTime--;
     _isCountDown = YES;
+    _currentTime--;
     self.userInteractionEnabled = NO;
     self.enabled = YES;
     
@@ -78,47 +81,60 @@
     
     if (_currentTime > 0) {
         if (self.countDownBlock) self.countDownBlock(self.currentTime);
-        NSString *title = [NSString stringWithFormat:_formatString ?: @"%@", @(_currentTime).stringValue];
+        NSString *current = @(_currentTime).stringValue;
+        NSString *title = [NSString stringWithFormat:_formatString ?: @"%@",current];
         [self setTitle:title forState:UIControlStateNormal];
         [self setTitleColor:_countDownColor forState:UIControlStateNormal];
-        if (self.delegate && [self.delegate respondsToSelector:@selector(countDownWithcurrentTime:)]) {
+        if (self.delegate&&[self.delegate respondsToSelector:@selector(countDownWithcurrentTime:)]) {
             [self.delegate countDownWithcurrentTime:self.currentTime];
         }
     }
 }
+
 /* 总时间 */
 - (void)setTotalTime:(NSInteger)totalTime {
     if (_isCountDown) return;
     _totalTime = totalTime;
     _currentTime = totalTime;
 }
+
 /* 速度 */
 - (void)setSpeedTime:(NSInteger)speedTime {
     if (_isCountDown) return;
     _speedTime = speedTime;
 }
+
 /* 原标题 */
 - (void)setTitle:(NSString *)title forState:(UIControlState)state {
     if (state == UIControlStateNormal && !_isCountDown) _oldTitle = title;
     [super setTitle:title forState:state];
 }
+
 - (void)setTitleColor:(UIColor *)color forState:(UIControlState)state {
     if (state == UIControlStateNormal && !_isCountDown) _oldColor = color;
     [super setTitleColor:color forState:state];
 }
+
 /* 定时器 */
 - (dispatch_source_t)countDownTimer {
     if (!_countDownTimer) {
+        __weak __typeof(self) weakself = self;
         dispatch_queue_t queue = dispatch_get_main_queue();
         _countDownTimer = dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER, 0, 0, queue);
-        dispatch_source_set_timer(_countDownTimer, dispatch_walltime(NULL, 0), _speedTime * NSEC_PER_SEC, 0);
-        dispatch_source_set_event_handler(_countDownTimer, ^{ [self countDown]; });
+        dispatch_source_set_timer(_countDownTimer,
+                                  dispatch_walltime(NULL, 0),
+                                  _speedTime * NSEC_PER_SEC, 0);
+        dispatch_source_set_event_handler(_countDownTimer, ^{
+            [weakself countDown];
+        });
     }
     return _countDownTimer;
 }
+
 - (void)didMoveToSuperview {
-    if (self.superview == nil)  [self endCountDown];
+    if (self.superview == nil) [self endCountDown];
 }
+
 - (void)dealloc {
     [self endCountDown];
 }
