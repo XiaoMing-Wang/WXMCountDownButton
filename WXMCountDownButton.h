@@ -10,16 +10,21 @@
 @protocol WXMCountDownDelegate <NSObject>
 @optional
 - (void)countDownWithcurrentTime:(NSInteger)currentTime;
-- (void)startCountDown;
+- (BOOL)startCountDown;
 - (void)endCountDown;
 @end
 
 @interface WXMCountDownButton : UIButton
-@property (nonatomic, assign) BOOL isCountDown;    /** 正在倒计时 */
-@property (nonatomic, assign) NSInteger totalTime; /** 总时间 默认60 */
-@property (nonatomic, assign) NSInteger speedTime; /** 每隔多久一次 默认1 */
-@property (nonatomic, strong) UIColor *countDownColor; /** 倒计时颜色 */
-@property (nonatomic, copy) NSString *formatString;    /** 默认 60 */
+/** 正在倒计时 */
+@property (nonatomic, assign) BOOL isCountDown;
+/** 总时间 默认60 */
+@property (nonatomic, assign) NSInteger totalTime;
+ /** 每隔多久一次 默认1 */
+@property (nonatomic, assign) NSInteger speedTime;
+ /** 倒计时颜色 */
+@property (nonatomic, strong) UIColor *countDownColor;
+ /** 默认 60 */
+@property (nonatomic, copy) NSString *formatString;
 @property (nonatomic, assign) id<WXMCountDownDelegate> delegate;
 @property (nonatomic, strong) void (^countDownBlock)(NSInteger currentTime);
 

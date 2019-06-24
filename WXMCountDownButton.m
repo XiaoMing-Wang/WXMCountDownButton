@@ -8,6 +8,7 @@
 
 #import "WXMCountDownButton.h"
 @interface WXMCountDownButton ()
+
 /** 当前数字 */
 @property (nonatomic, assign) NSInteger currentTime;
 @property (nonatomic, strong) dispatch_source_t countDownTimer;
@@ -16,6 +17,7 @@
 @end
 
 @implementation WXMCountDownButton
+
 - (instancetype)initWithFrame:(CGRect)frame {
     if (self = [super initWithFrame:frame]) {
         _currentTime = 60.0;
@@ -26,17 +28,18 @@
         _oldTitle = @"重新发送";
         _oldColor = [UIColor whiteColor];
         self.titleLabel.font = [UIFont systemFontOfSize:12];
-        [self addTarget:self action:@selector(buttonClick) forControlEvents:UIControlEventTouchUpInside];
+        UIControlEvents event = UIControlEventTouchUpInside;
+        [self addTarget:self action:@selector(buttonClick) forControlEvents:event];
     }
     return self;
 }
 
 - (void)buttonClick {
-    if (self.delegate && [self.delegate respondsToSelector:@selector(startCountDown)]) {
-        [self.delegate startCountDown]; return;
-    } else {
-       [self startCountDown];
+    if ([self.delegate respondsToSelector:@selector(startCountDown)]) {
+        BOOL start = [self.delegate startCountDown];
+        if (!start) return;
     }
+    [self startCountDown];
 }
 
 /* 开始 */
@@ -85,7 +88,7 @@
         NSString *title = [NSString stringWithFormat:_formatString ?: @"%@",current];
         [self setTitle:title forState:UIControlStateNormal];
         [self setTitleColor:_countDownColor forState:UIControlStateNormal];
-        if (self.delegate&&[self.delegate respondsToSelector:@selector(countDownWithcurrentTime:)]) {
+        if ([self.delegate respondsToSelector:@selector(countDownWithcurrentTime:)]) {
             [self.delegate countDownWithcurrentTime:self.currentTime];
         }
     }
